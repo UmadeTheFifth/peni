@@ -1,0 +1,6 @@
+(async()=>{
+ const host=document.getElementById('reviewsList'),form=document.getElementById('reviewForm'),feedback=document.getElementById('reviewFeedback');
+ async function load(){try{const r=await fetch('/api/reviews');if(!r.ok)throw Error();const data=await r.json();host.innerHTML=data.reviews?.length?data.reviews.map(x=>`<article class="review-card"><div class="review-stars" aria-label="${Number(x.rating)} out of 5 stars">${'★'.repeat(Number(x.rating))}</div><blockquote>“${PeniStore.esc(x.message)}”</blockquote><span class="review-by">${PeniStore.esc(x.name).toUpperCase()}</span></article>`).join(''):'<div class="empty-review">No published reviews yet. Be the first to share your experience.</div>';}catch{host.innerHTML='<div class="empty-review">Reviews are temporarily unavailable.</div>'}}
+ form?.addEventListener('submit',async e=>{e.preventDefault();const btn=form.querySelector('button');btn.disabled=true;feedback.textContent='';try{await PeniStore.postJSON('/api/reviews',Object.fromEntries(new FormData(form)));feedback.textContent='Thank you. Your review has been submitted for approval.';form.reset()}catch(err){feedback.textContent=err.message}finally{btn.disabled=false}});
+ await load();
+})();
